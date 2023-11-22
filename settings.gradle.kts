@@ -1,5 +1,6 @@
 rootProject.name = "java-hw"
 include("hw01-gradle")
+include("hw02-collections")
 
 
 pluginManagement {
@@ -23,3 +24,4 @@ pluginManagement {
         id("com.diffplug.spotless") version spotless
     }
 }
+
