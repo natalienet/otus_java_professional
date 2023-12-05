@@ -1,5 +1,6 @@
 package ru.nn.services;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,45 +17,34 @@ public class TestRunner {
 
         Class<?> clazz = Class.forName(className);
         TestStatistics statistics = new TestStatistics();
-        List<List<Method>> methods = getAnnotatedMethods(clazz);
-        invokeMethods(clazz, methods, statistics);
+        List<Method> beforeMethods = getAnnotatedMethods(clazz, Before.class);
+        List<Method> testMethods = getAnnotatedMethods(clazz, Test.class);
+        List<Method> afterMethods = getAnnotatedMethods(clazz, After.class);
+        invokeMethods(clazz, beforeMethods, testMethods, afterMethods, statistics);
         printStatistic(statistics);
     }
 
-    private List<List<Method>> getAnnotatedMethods(Class<?> clazz) {
-        List<Method> beforeMethods = new ArrayList<>();
-        List<Method> testMethods = new ArrayList<>();
-        List<Method> afterMethods = new ArrayList<>();
+    private List<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotationClass) {
+        List<Method> methods = new ArrayList<>();
         Method[] methodsAll = clazz.getDeclaredMethods();
         for (Method method : methodsAll) {
-            if (method.isAnnotationPresent(Before.class)) {
-                beforeMethods.add(method);
-            }
-
-            if (method.isAnnotationPresent(Test.class)) {
-                testMethods.add(method);
-            }
-
-            if (method.isAnnotationPresent(After.class)) {
-                afterMethods.add(method);
+            if (method.isAnnotationPresent(annotationClass)) {
+                methods.add(method);
             }
         }
-        List<List<Method>> methods = new ArrayList<>();
-        methods.add(beforeMethods);
-        methods.add(testMethods);
-        methods.add(afterMethods);
+
         return methods;
     }
 
-    private void invokeMethods(Class<?> clazz, List<List<Method>> methods, TestStatistics statistics)
+    private void invokeMethods(Class<?> clazz, List<Method> beforeMethods, List<Method> testMethods,
+                               List<Method> afterMethods, TestStatistics statistics)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Object object;
-        List<Method> testMethods = methods.get(1);
         boolean beforeResult = false;
         for (Method testMethod : testMethods) {
             statistics.setTotalTests(statistics.getTotalTests() + 1);
             object = clazz.getConstructor().newInstance();
-            for (Method method : methods.get(0)) {
+            for (Method method : beforeMethods) {
                 beforeResult = invokeMethod(object, method);
                 if (!beforeResult) {
                     break;
@@ -69,7 +59,7 @@ public class TestRunner {
                 }
             }
 
-            for (Method method : methods.get(2)) {
+            for (Method method : afterMethods) {
                 invokeMethod(object, method);
             }
         }
