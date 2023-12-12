@@ -1,7 +1,8 @@
 rootProject.name = "java-hw"
 include("hw01-gradle")
 include("hw02-collections")
-
+include("hw03-annotations")
+include("hw04-gc")
 
 pluginManagement {
     val jgitver: String by settings
@@ -24,4 +25,4 @@ pluginManagement {
         id("com.diffplug.spotless") version spotless
     }
 }
-include("hw03-annotations")
+
