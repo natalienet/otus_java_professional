@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.LoggerFactory;
 
@@ -20,15 +21,18 @@ class Ioc {
 
     static class LoggingHandler implements InvocationHandler {
         private final TestLoggingInterface testClass;
+        private final List<Method> logAnnotatedMethods;
 
         LoggingHandler(TestLoggingInterface testClass) {
             this.testClass = testClass;
+            logAnnotatedMethods = Arrays.stream(testClass.getClass().getDeclaredMethods())
+                    .filter(method -> method.isAnnotationPresent(Log.class)).toList();
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Method classMethod = testClass.getClass().getMethod(method.getName(), method.getParameterTypes());
-            if (classMethod.isAnnotationPresent(Log.class)) {
+            if (logAnnotatedMethods.contains(classMethod)) {
                 logger.info(
                         "executed method: {}, param: {}",
                         method.getName(),
