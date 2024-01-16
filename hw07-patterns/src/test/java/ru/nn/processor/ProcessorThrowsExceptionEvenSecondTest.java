@@ -1,49 +1,59 @@
 package ru.nn.processor;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalTime;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.nn.model.Message;
 import ru.nn.processor.homework.ProcessorThrowsExceptionEvenSecond;
 
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+
 class ProcessorThrowsExceptionEvenSecondTest {
+    static Message message;
+    static ProcessorThrowsExceptionEvenSecond processor;
+
+    @BeforeAll
+    static void setUp() {
+        message = new Message.Builder(1L).field9("field9").build();
+        processor = new ProcessorThrowsExceptionEvenSecond();
+    }
+
     @Test
     @DisplayName("Тестируем вызов исключения в четную секунду")
     void throwExceptionEvenSecondTest() {
-        var message = new Message.Builder(1L).field9("field9").build();
+        int seconds;
+        LocalTime time = LocalTime.now();
 
-        var processor = mock(ProcessorThrowsExceptionEvenSecond.class);
-        when(processor.process(message)).thenThrow(new RuntimeException());
-
-        if (LocalTime.now().getSecond() % 2 != 0) {
+        while (LocalTime.now().minusSeconds(5).compareTo(time) < 0) {
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                processor.process(message);
+            } catch (RuntimeException e) {
+                seconds = LocalTime.now().getSecond();
+                assertThat(seconds % 2).isEqualTo(0);
+                return;
             }
+
         }
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> processor.process(message));
+        fail();
     }
 
     @Test
     @DisplayName("Тестируем возврат сообщения в нечетную секунду")
     void returnMessageOddSecondTest() {
-        var message = new Message.Builder(1L).field9("field9").build();
+        Message returnedMessage;
+        LocalTime time = LocalTime.now();
 
-        var processor = mock(ProcessorThrowsExceptionEvenSecond.class);
-        when(processor.process(message)).thenReturn(message);
-
-        if (LocalTime.now().getSecond() % 2 == 0) {
+        while (LocalTime.now().minusSeconds(5).compareTo(time) < 0) {
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                returnedMessage = processor.process(message);
+                assertThat(LocalTime.now().getSecond() % 2).isEqualTo(1);
+                assertThat(returnedMessage).isEqualTo(message);
+                return;
+            } catch (RuntimeException e) {
             }
         }
-        assertThat(processor.process(message)).isEqualTo(message);
     }
 }
