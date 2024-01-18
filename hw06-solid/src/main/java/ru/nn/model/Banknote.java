@@ -1,4 +1,4 @@
-package ru.nn.domain;
+package ru.nn.model;
 
 public class Banknote {
     private final int nominal;

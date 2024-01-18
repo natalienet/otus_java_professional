@@ -1,24 +1,23 @@
-package ru.nn.domain;
+package ru.nn.model;
 
-import ru.nn.api.AlgorithmForCalcMinNumberOfBanknotes;
+import ru.nn.api.AlgorithmForGivingOutBanknotes;
 import ru.nn.api.OutputService;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ATM {
     private final Map<Integer, Cell> cells;
     private final OutputService outputService;
-    private final AlgorithmForCalcMinNumberOfBanknotes algorithm;
+    private final AlgorithmForGivingOutBanknotes algorithm;
 
-    public ATM(List<Integer> nominalOfBanknotes, OutputService outputService, AlgorithmForCalcMinNumberOfBanknotes algorithm) {
+    public ATM(int[] nominalOfBanknotes, OutputService outputService, AlgorithmForGivingOutBanknotes algorithm) {
         this.outputService = outputService;
         this.algorithm = algorithm;
         cells = new HashMap<>();
-        for (Integer nominal : nominalOfBanknotes) {
+        for (int nominal : nominalOfBanknotes) {
             cells.put(nominal, new Cell(nominal));
         }
     }
@@ -28,12 +27,16 @@ public class ATM {
     }
 
     public void printCashBalance() {
-        outputService.printMessage(String.format("Cash balance: %d", getCashBalance()));
+        outputService.printMessage(String.format("Всего наличных: %d", getCashBalance()));
     }
 
     public void acceptBanknotes(List<Banknote> banknotes) {
         for (Banknote banknote : banknotes) {
-            cells.get(banknote.getNominal()).addBanknote(banknote);
+            if (cells.containsKey(banknote.getNominal())) {
+                cells.get(banknote.getNominal()).addBanknote(banknote);
+            } else {
+                outputService.printMessage("Банкнота не распознана.");
+            }
         }
     }
 
@@ -56,13 +59,13 @@ public class ATM {
     private String createMessageAboutIssuanceOfCash(Map<Integer, Integer> banknotes, int sum) {
         String message;
         if (banknotes.isEmpty()) {
-            message = "It's not possible to issue the requested amount of cash.";
+            message = "Невозможно выдать запрошенную сумму.";
         } else {
             List<String> strings = new LinkedList<>();
             for (Map.Entry<Integer, Integer> entry : banknotes.entrySet()) {
-                strings.add("nominal " + entry.getKey() + " - " + entry.getValue());
+                strings.add("номинал " + entry.getKey() + " - " + entry.getValue());
             }
-            message = "Issuance of cash in the amount of " + sum + " banknotes with: " + String.join(", ", strings);
+            message = "Выдача наличных в размере " + sum + " банкнотами: " + String.join(", ", strings);
         }
         return message;
     }

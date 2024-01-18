@@ -1,4 +1,4 @@
-package ru.nn.domain;
+package ru.nn.model;
 
 import java.util.ArrayList;
 import java.util.List;

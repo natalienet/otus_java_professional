@@ -1,10 +1,10 @@
 package ru.nn.services;
 
-import ru.nn.api.AlgorithmForCalcMinNumberOfBanknotes;
+import ru.nn.api.AlgorithmForGivingOutBanknotes;
 
 import java.util.*;
 
-public class AlgorithmForCalcMinNumberOfBanknotesImpl implements AlgorithmForCalcMinNumberOfBanknotes {
+public class SimpleAlgorithmForGivingOutBanknotes implements AlgorithmForGivingOutBanknotes {
     public Map<Integer, Integer> getMinNumberOfBanknotes(int sum, Map<Integer, Integer> banknotesInCells) {
 
         NavigableMap<Integer, Integer> numberOfBanknotes = new TreeMap<>();
