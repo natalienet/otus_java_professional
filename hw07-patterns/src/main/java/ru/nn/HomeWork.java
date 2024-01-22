@@ -8,6 +8,7 @@ import ru.nn.handler.ComplexProcessor;
 import ru.nn.listener.homework.HistoryListener;
 import ru.nn.model.Message;
 import ru.nn.model.ObjectForMessage;
+import ru.nn.processor.homework.ParityOfSecondChecker;
 import ru.nn.processor.homework.ProcessorSwapField11AndField12;
 import ru.nn.processor.homework.ProcessorThrowsExceptionEvenSecond;
 
@@ -15,7 +16,8 @@ public class HomeWork {
     private static final Logger logger = LoggerFactory.getLogger(HomeWork.class);
 
     public static void main(String[] args) {
-        var processors = List.of(new ProcessorSwapField11AndField12(), new ProcessorThrowsExceptionEvenSecond());
+        var processors = List.of(new ProcessorSwapField11AndField12(),
+                new ProcessorThrowsExceptionEvenSecond(new ParityOfSecondChecker()));
 
         var complexProcessor = new ComplexProcessor(processors, ex -> {});
         var historyListener = new HistoryListener();
