@@ -5,11 +5,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
-    private Class<T> paramClass;
-    private Constructor<T> constructor;
+    private final Class<T> paramClass;
 
     public EntityClassMetaDataImpl() {
         ParameterizedType type = (ParameterizedType) EntityClassMetaDataImpl.class.getGenericSuperclass();
@@ -24,10 +24,18 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
     @Override
     public Constructor<T> getConstructor() {
         try {
-            return paramClass.getConstructor();
+            return paramClass.getDeclaredConstructor();
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+        //try {
+//            return (Constructor<T>) Arrays.stream(paramClass.getDeclaredConstructors())
+//                    .max(Comparator.comparing(Constructor::getParameterCount)).get();
+                    //.orElseThrow(() -> new RuntimeException());
+                    //.findFirst().orElseThrow(() -> new RuntimeException());
+//        } catch (NoSuchMethodException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     @Override
