@@ -10,9 +10,7 @@ import ru.nn.crm.model.Client;
 import ru.nn.crm.model.Manager;
 import ru.nn.crm.service.DbServiceClientImpl;
 import ru.nn.crm.service.DbServiceManagerImpl;
-import ru.nn.jdbc.mapper.DataTemplateJdbc;
-import ru.nn.jdbc.mapper.EntityClassMetaData;
-import ru.nn.jdbc.mapper.EntitySQLMetaData;
+import ru.nn.jdbc.mapper.*;
 
 import javax.sql.DataSource;
 
@@ -32,8 +30,8 @@ public class HomeWork {
         var dbExecutor = new DbExecutorImpl();
 
         // Работа с клиентом
-        EntityClassMetaData<Client> entityClassMetaDataClient; // = new EntityClassMetaDataImpl();
-        EntitySQLMetaData entitySQLMetaDataClient = null; // = new EntitySQLMetaDataImpl(entityClassMetaDataClient);
+        EntityClassMetaData<Client> entityClassMetaDataClient = new EntityClassMetaDataImpl<Client>();
+        EntitySQLMetaData entitySQLMetaDataClient  = new EntitySQLMetaDataImpl<Client>(entityClassMetaDataClient);
         var dataTemplateClient = new DataTemplateJdbc<Client>(
                 dbExecutor, entitySQLMetaDataClient); // реализация DataTemplate, универсальная
 

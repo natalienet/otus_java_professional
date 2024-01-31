@@ -1,6 +1,9 @@
 package ru.nn.crm.model;
 
+import ru.nn.jdbc.mapper.Id;
+
 public class Manager {
+    @Id
     private Long no;
     private String label;
     private String param1;

@@ -1,6 +1,9 @@
 package ru.nn.crm.model;
 
+import ru.nn.jdbc.mapper.Id;
+
 public class Client {
+    @Id
     private Long id;
     private String name;
 
