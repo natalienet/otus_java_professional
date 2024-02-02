@@ -23,19 +23,16 @@ public class HomeWork {
     private static final Logger log = LoggerFactory.getLogger(HomeWork.class);
 
     public static void main(String[] args) {
-        // Общая часть
         var dataSource = new DriverManagerDataSource(URL, USER, PASSWORD);
         flywayMigrations(dataSource);
         var transactionRunner = new TransactionRunnerJdbc(dataSource);
         var dbExecutor = new DbExecutorImpl();
 
-        // Работа с клиентом
-        EntityClassMetaData<Client> entityClassMetaDataClient = new EntityClassMetaDataImpl<Client>();
-        EntitySQLMetaData entitySQLMetaDataClient  = new EntitySQLMetaDataImpl<Client>(entityClassMetaDataClient);
+        EntityClassMetaData<Client> entityClassMetaDataClient = new EntityClassMetaDataImpl<Client>(Client.class);
+        EntitySQLMetaData entitySQLMetaDataClient = new EntitySQLMetaDataImpl<Client>(entityClassMetaDataClient);
         var dataTemplateClient = new DataTemplateJdbc<Client>(
                 dbExecutor, entitySQLMetaDataClient, entityClassMetaDataClient); // реализация DataTemplate, универсальная
 
-        // Код дальше должен остаться
         var dbServiceClient = new DbServiceClientImpl(transactionRunner, dataTemplateClient);
         dbServiceClient.saveClient(new Client("dbServiceFirst"));
 
@@ -45,9 +42,7 @@ public class HomeWork {
                 .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
         log.info("clientSecondSelected:{}", clientSecondSelected);
 
-        // Сделайте тоже самое с классом Manager (для него надо сделать свою таблицу)
-
-        EntityClassMetaData<Manager> entityClassMetaDataManager = new EntityClassMetaDataImpl<Manager>();
+        EntityClassMetaData<Manager> entityClassMetaDataManager = new EntityClassMetaDataImpl<Manager>(Manager.class);
         EntitySQLMetaData entitySQLMetaDataManager = new EntitySQLMetaDataImpl<Manager>(entityClassMetaDataManager);
         var dataTemplateManager = new DataTemplateJdbc<Manager>(
                 dbExecutor, entitySQLMetaDataManager, entityClassMetaDataManager);
