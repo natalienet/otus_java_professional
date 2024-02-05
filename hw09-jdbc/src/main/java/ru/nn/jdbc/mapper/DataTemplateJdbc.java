@@ -18,23 +18,16 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     private final EntitySQLMetaData entitySQLMetaData;
     private final EntityClassMetaData<T> entityClassMetaData;
 
-    private final Map<Long, T> cache;
-
     public DataTemplateJdbc(DbExecutor dbExecutor, EntitySQLMetaData entitySQLMetaData,
                             EntityClassMetaData<T> entityClassMetaData) {
         this.dbExecutor = dbExecutor;
         this.entitySQLMetaData = entitySQLMetaData;
         this.entityClassMetaData = entityClassMetaData;
-        cache = new HashMap<>();
     }
 
     @Override
     public Optional<T> findById(Connection connection, long id) {
-        if (cache.containsKey(id)) {
-            return Optional.of(cache.get(id));
-        }
-
-        Optional<T> object = dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), rs -> {
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), rs -> {
             try {
                 if (rs.next()) {
                     return createObject(rs);
@@ -44,15 +37,11 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 throw new DataTemplateException(e);
             }
         });
-
-        object.ifPresent(t -> cache.put(id, t));
-
-        return object;
     }
 
     @Override
     public List<T> findAll(Connection connection) {
-        List<T> objects = dbExecutor
+        return dbExecutor
                 .executeSelect(connection, entitySQLMetaData.getSelectAllSql(), Collections.emptyList(), rs -> {
                     var objectList = new ArrayList<T>();
                     try {
@@ -67,28 +56,14 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                     }
                 })
                 .orElseThrow(() -> new RuntimeException("Unexpected error"));
-
-        try {
-            cache.clear();
-            for (T object : objects) {
-                long id = getObjectId(object);
-                cache.put(id, object);
-            }
-        } catch (IllegalAccessException e) {
-            throw new DataTemplateException(e);
-        }
-        return objects;
     }
 
     @Override
     public long insert(Connection connection, T object) {
         try {
             List<Object> fieldValues = getValuesOfObjectFields(object);
-            long objectId = dbExecutor.executeStatement(
+            return dbExecutor.executeStatement(
                     connection, entitySQLMetaData.getInsertSql(), fieldValues);
-
-            cache.put(objectId, object);
-            return objectId;
         } catch (Exception e) {
             throw new DataTemplateException(e);
         }
@@ -100,11 +75,6 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             List<Object> fieldValues = getValuesOfObjectFields(object);
             dbExecutor.executeStatement(
                     connection, entitySQLMetaData.getUpdateSql(), fieldValues);
-
-            long objectId = getObjectId(object);
-            if (cache.containsKey(objectId)) {
-                cache.put(objectId, object);
-            }
         } catch (Exception e) {
             throw new DataTemplateException(e);
         }
@@ -128,9 +98,5 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             fieldValues.add(field.get(object));
         }
         return fieldValues;
-    }
-
-    private long getObjectId(T object) throws IllegalAccessException {
-        return (long) entityClassMetaData.getIdField().get(object);
     }
 }
