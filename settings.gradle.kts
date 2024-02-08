@@ -26,3 +26,4 @@ pluginManagement {
     }
 }
 
+include("hw11-jpql")
