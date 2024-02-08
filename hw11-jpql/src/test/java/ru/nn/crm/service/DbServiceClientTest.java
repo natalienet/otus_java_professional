@@ -1,11 +1,11 @@
-package ru.otus.crm.service;
+package ru.nn.crm.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.nn.crm.model.Address;
 import ru.nn.crm.model.Client;
 import ru.nn.crm.model.Phone;
-import ru.otus.base.AbstractHibernateTest;
+import ru.nn.base.AbstractHibernateTest;
 
 import java.util.List;
 
