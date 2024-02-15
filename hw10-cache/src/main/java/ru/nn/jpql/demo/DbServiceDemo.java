@@ -3,6 +3,7 @@ package ru.nn.jpql.demo;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.nn.cache.MyCache;
 import ru.nn.jpql.core.repository.DataTemplateHibernate;
 import ru.nn.jpql.core.repository.HibernateUtils;
 import ru.nn.jpql.core.sessionmanager.TransactionManagerHibernate;
@@ -28,7 +29,9 @@ public class DbServiceDemo {
         ///
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
         ///
-        var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
+        var cache = new MyCache<String, Client>();
+
+        var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate, cache);
         dbServiceClient.saveClient(new Client(null, "dbServiceFirst", new Address(null, "AnyStreet1"), List.of(new Phone(null, "13-555-22"),
                 new Phone(null, "14-666-333"))));
 

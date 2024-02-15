@@ -1,15 +1,14 @@
 package ru.nn.jpql.crm.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.WeakHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.nn.cache.HwCache;
 import ru.nn.jpql.core.repository.DataTemplate;
 import ru.nn.jpql.core.sessionmanager.TransactionManager;
 import ru.nn.jpql.crm.model.Client;
+
+import java.util.List;
+import java.util.Optional;
 
 public class DbServiceClientImpl implements DBServiceClient {
     private static final Logger log = LoggerFactory.getLogger(DbServiceClientImpl.class);
@@ -17,12 +16,13 @@ public class DbServiceClientImpl implements DBServiceClient {
     private final DataTemplate<Client> clientDataTemplate;
     private final TransactionManager transactionManager;
 
-    Map<String, Client> cache;
+    private final HwCache<String, Client> cache;
 
-    public DbServiceClientImpl(TransactionManager transactionManager, DataTemplate<Client> clientDataTemplate) {
+    public DbServiceClientImpl(TransactionManager transactionManager, DataTemplate<Client> clientDataTemplate,
+                               HwCache<String, Client> cache) {
         this.transactionManager = transactionManager;
         this.clientDataTemplate = clientDataTemplate;
-        cache = new WeakHashMap<>();
+        this.cache = cache;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class DbServiceClientImpl implements DBServiceClient {
     @Override
     public Optional<Client> getClient(long id) {
         String idAsString = String.valueOf(id);
-        if (cache.containsKey(idAsString)) {
+        if (cache.get(idAsString) != null) {
             return Optional.of(cache.get(idAsString));
         }
         Optional<Client> client = transactionManager.doInReadOnlyTransaction(session -> {
@@ -67,7 +67,6 @@ public class DbServiceClientImpl implements DBServiceClient {
             return clientList;
         });
 
-        cache.clear();
         for (Client client : clients) {
             cache.put(String.valueOf(client.getId()), client);
         }
