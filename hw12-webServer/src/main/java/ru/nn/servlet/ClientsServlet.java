@@ -4,21 +4,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.util.*;
-
 import ru.nn.crm.model.Address;
 import ru.nn.crm.model.Client;
 import ru.nn.crm.model.Phone;
 import ru.nn.crm.service.DBServiceClient;
 import ru.nn.services.TemplateProcessor;
 
+import java.io.IOException;
+import java.util.*;
+
 @SuppressWarnings({"squid:S1948"})
 public class ClientsServlet extends HttpServlet {
 
     private static final String CLIENTS_PAGE_TEMPLATE = "clients.html";
-    //private static final String TEMPLATE_ATTR_RANDOM_USER = "randomUser";
 
     private final DBServiceClient dbServiceClient;
     private final TemplateProcessor templateProcessor;
