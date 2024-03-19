@@ -1,0 +1,100 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Клиенты</title>
+    <script>
+        function createClient() {
+            const clientNameTextBox = document.getElementById('clientNameTextBox');
+            const clientAddressTextBox = document.getElementById('clientAddressTextBox');
+            const clientPhoneTextBox = document.getElementById('clientPhoneTextBox');
+            const name = clientNameTextBox.value;
+            const street = clientAddressTextBox.value;
+            const number = clientPhoneTextBox.value;
+            fetch('api/client/', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: name,
+                    address: {
+                        street: street
+                    },
+                    phones: [{
+                        number: number
+                    }]
+                }),
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                }
+            })
+        }
+    </script>
+
+    <style>
+        .clients td {
+            border: 1px solid black;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 305px;
+        }
+    </style>
+</head>
+
+
+<body>
+<form class="create-form" id="create-form" method="post" accept-charset="utf-8">
+    <h4>Создать клиента</h4>
+
+    <div class="row">
+        <label for="clientName">Имя:</label>
+        <input type="text" id = "clientName" name = "clientName">
+    </div>
+    <div class="row">
+        <label for="clientAddress">Адрес:</label>
+        <input type="text" id = "clientAddress" name = "clientAddress">
+    </div>
+    <div class="row">
+        <label for="clientPhone">Телефон:</label>
+        <input type="text" id = "clientPhone" name = "clientPhone">
+    </div>
+
+    <div class="row">
+        <button type="submit">Save</button>
+    </div>
+</form>
+
+</p>
+
+<h4>Список клиентов</h4>
+<table class="clients">
+    <thead>
+        <tr>
+            <td style="width: 50px">Id</td>
+            <td style="width: 150px">Имя</td>
+            <td style="width: 250px">Адрес</td>
+            <td style="width: 100px">Телефон</td>
+        </tr>
+    </thead>
+    <tbody>
+        <#list clients as client>
+            <tr>
+                <#list client as field>
+                    <td>${field}</td>
+                </#list>
+            </tr>
+        </#list>
+    </tbody>
+</table>
+</body>
+</html>
