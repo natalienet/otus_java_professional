@@ -1,5 +1,6 @@
 package ru.nn;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +27,7 @@ public class WebServerWithFilterBasedSecurity {
     public static final String HIBERNATE_CFG_FILE = "hibernate.cfg.xml";
 
     public static void main(String[] args) throws Exception {
-        var configuration = new Configuration().configure(HIBERNATE_CFG_FILE);
-        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class);
+        var sessionFactory = getSessionFactory();
         var transactionManager = new TransactionManagerHibernate(sessionFactory);
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
         var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
@@ -41,5 +41,10 @@ public class WebServerWithFilterBasedSecurity {
 
         clientsWebServer.start();
         clientsWebServer.join();
+    }
+
+    private static SessionFactory getSessionFactory() {
+        var configuration = new Configuration().configure(HIBERNATE_CFG_FILE);
+        return HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class);
     }
 }

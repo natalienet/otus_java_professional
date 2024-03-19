@@ -12,6 +12,7 @@ import ru.nn.services.TemplateProcessor;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"squid:S1948"})
 public class ClientsServlet extends HttpServlet {
@@ -33,7 +34,7 @@ public class ClientsServlet extends HttpServlet {
         List<Client> clients = dbServiceClient.findAll();
         for (Client client : clients) {
             clientsFields.add(Arrays.asList(client.getId().toString(), client.getName(), client.getAddress().getStreet(),
-                    client.getPhones().getFirst().getNumber()));
+                    client.getPhones().stream().map(Phone::getNumber).collect(Collectors.joining())));
         }
         paramsMap.put("clients", clientsFields);
 
